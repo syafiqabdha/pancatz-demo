@@ -2,20 +2,23 @@ import { createClient } from '../../utils/supabase/server';
 import { cookies } from 'next/headers';
 
 export default async function Page() {
-  const cookieStore = await cookies();
-  const supabase = createClient(cookieStore);
-
-  const { data: todos, error } = await supabase.from('todos').select();
+  const supabase = createClient(await cookies());
+  const { data, error } = await supabase.from('todos').select();
 
   if (error) {
     console.error('Supabase error:', error);
-    return <p>Failed to load todos.</p>;
+    return (
+      <p>
+        Could not load todos. Ensure a table named <code>todos</code> exists in your Supabase
+        project (or adjust the query).
+      </p>
+    );
   }
 
   return (
     <ul>
-      {todos?.map((todo: any, idx: number) => (
-        <li key={idx}>{JSON.stringify(todo)}</li>
+      {data?.map((todo: any) => (
+        <li key={todo.id ?? JSON.stringify(todo)}>{JSON.stringify(todo)}</li>
       ))}
     </ul>
   );
