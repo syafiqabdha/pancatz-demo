@@ -16,8 +16,9 @@ pipeline {
     stages {
         stage('Clean Install') {
             steps {
-                echo 'Installing dependencies...'
-                // Using 'npm ci' is faster and more reliable for Jenkins than 'npm install'
+                echo 'Installing system dependencies...'
+                sh 'apt-get update && apt-get install -y libatomic1 || true'
+                echo 'Installing node dependencies...'
                 sh 'npm ci'
             }
         }
