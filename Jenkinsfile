@@ -1,24 +1,55 @@
 pipeline {
     agent any
 
-    // This block is what connects the "Tools" setting to your script
     tools {
+        // This must match the name you set in Manage Jenkins -> Tools
         nodejs 'node' 
     }
 
+    environment {
+        // Ensures Next.js runs in production mode during build
+        NODE_ENV = 'production'
+    }
+
     stages {
-        stage('Check Environment') {
+        stage('Clean Install') {
             steps {
-                sh 'node -v'
-                sh 'npm -v'
+                echo 'Installing dependencies...'
+                // Using 'npm ci' is faster and more reliable for Jenkins than 'npm install'
+                sh 'npm ci'
             }
         }
-        stage('Install & Test') {
+
+        stage('Type Check & Lint') {
             steps {
-                // If this fails, make sure you have a package.json in your repo
-                sh 'npm install'
-                sh 'npm test'
+                echo 'Checking TypeScript and Linting...'
+                sh 'npm run lint'
             }
+        }
+
+        stage('Build Project') {
+            steps {
+                echo 'Building Next.js application...'
+                // This triggers 'next build' which compiles Tailwind 4 and TS
+                sh 'npm run build'
+            }
+        }
+
+        stage('Archive Build') {
+            steps {
+                echo 'Archiving production build...'
+                // Archives the .next folder and public files
+                archiveArtifacts artifacts: '.next/**, public/**, package.json', allowEmptyArchive: true
+            }
+        }
+    }
+
+    post {
+        failure {
+            echo 'Build failed. Check for TypeScript errors or Tailwind configuration issues.'
+        }
+        success {
+            echo 'Next.js 14 Build Successful!'
         }
     }
 }
