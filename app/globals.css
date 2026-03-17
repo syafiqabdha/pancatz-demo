@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --c-primary: #212529;
+  --c-bg: #ffffff;
+  --c-accent: #212529; /* default – overridden per service */
+}
+
+.service-creative { --c-bg:#fff7f2; --c-accent:#ff6b6b; }
+.service-it { --c-bg:#f1fafa; --c-accent:#006d77; }
+.service-photo { --c-bg:#ffffff; --c-accent:#212529; }
