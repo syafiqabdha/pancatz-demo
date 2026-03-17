@@ -4,7 +4,8 @@ out/
 build/
 .dist/
 .env
+.env.local
 .DS_Store
-coverage/
+coverage/*
 *.log
 .vscode/
