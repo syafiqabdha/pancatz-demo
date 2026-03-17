@@ -1,18 +1,21 @@
 pipeline {
     agent any
-    
-    // We removed the 'tools' block to avoid the error
-    
+
+    // This block is what connects the "Tools" setting to your script
+    tools {
+        nodejs 'node' 
+    }
+
     stages {
         stage('Check Environment') {
             steps {
-                // This checks if node is already installed on your server
                 sh 'node -v'
                 sh 'npm -v'
             }
         }
         stage('Install & Test') {
             steps {
+                // If this fails, make sure you have a package.json in your repo
                 sh 'npm install'
                 sh 'npm test'
             }
