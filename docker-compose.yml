@@ -1,0 +1,53 @@
+version: '3.6'
+services:
+  db:
+    image: supabase/postgres:15.3.0
+    container_name: supabase_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    image: supabase/gotrue:2.98.0
+    container_name: supabase_gotrue
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      GOTRUE_DB_DRIVER: pg
+      GOTRUE_DB_DATABASE_URL: postgres://postgres:postgres@db:5432/postgres
+      GOTRUE_SITE_URL: http://localhost:3000
+      GOTRUE_JWT_SECRET: super-secret-jwt-token-change-me
+    ports:
+      - '8000:8000'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  studio:
+    image: supabase/studio:latest
+    container_name: supabase_studio
+    restart: unless-stopped
+    depends_on:
+      - api
+    environment:
+      SUPABASE_URL: http://localhost:8000
+    ports:
+      - '3001:3000'
+
+volumes:
+  db-data:
