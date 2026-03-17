@@ -9,6 +9,9 @@ pipeline {
     environment {
         // Ensures Next.js runs in production mode during build
         NODE_ENV = 'production'
+        // Supabase credentials (set in Jenkins global credentials)
+        NEXT_PUBLIC_SUPABASE_URL = credentials('supabase_url')
+        NEXT_PUBLIC_SUPABASE_ANON_KEY = credentials('supabase_anon_key')
     }
 
     stages {
