@@ -1,42 +1,21 @@
 pipeline {
     agent any
-
-    // This ensures Node.js is available on your Jenkins server
-    tools {
-        nodejs 'node' // Note: This name must match what you set in Global Tool Configuration
-    }
-
+    
+    // We removed the 'tools' block to avoid the error
+    
     stages {
-        stage('Install Dependencies') {
+        stage('Check Environment') {
             steps {
-                echo 'Installing modules...'
-                sh 'npm install'
+                // This checks if node is already installed on your server
+                sh 'node -v'
+                sh 'npm -v'
             }
         }
-
-        stage('Lint & Test') {
+        stage('Install & Test') {
             steps {
-                echo 'Running tests...'
-                // This runs the "test" script defined in your package.json
+                sh 'npm install'
                 sh 'npm test'
             }
-        }
-
-        stage('Build') {
-            steps {
-                echo 'Building application...'
-                // Only keep this if you have a build script, otherwise delete this stage
-                sh 'npm run build --if-present'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Cleaning up workspace...'
-        }
-        failure {
-            echo 'Build failed! Please check the npm logs above.'
         }
     }
 }
